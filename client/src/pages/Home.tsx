@@ -1,97 +1,63 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExternalLink, Star, Zap, Target, Package } from "lucide-react";
+import { ExternalLink, Star, Zap, Target, Package, FileText } from "lucide-react";
 
-interface Skill {
-  name: string;
-  source: string;
-  link: string;
-  function: string;
-  usage: string;
-  rating: number;
-}
-
-function RatingBadge({ rating }: { rating: number }) {
-  const getColor = (r: number) => {
-    if (r >= 9.5) return "bg-emerald-100 text-emerald-800";
-    if (r >= 9) return "bg-green-100 text-green-800";
-    if (r >= 8.5) return "bg-blue-100 text-blue-800";
-    return "bg-amber-100 text-amber-800";
-  };
-  return (
-    <Badge className={`${getColor(rating)} font-semibold`}>
-      <Star className="w-3 h-3 mr-1 fill-current" />
-      {rating}/10
-    </Badge>
-  );
-}
-
-function SkillCard({ skill }: { skill: Skill }) {
-  return (
-    <Card className="hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1">
-            <CardTitle className="text-lg">{skill.name}</CardTitle>
-            <CardDescription className="text-xs mt-1">{skill.source}</CardDescription>
-          </div>
-          <RatingBadge rating={skill.rating} />
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-3">
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground mb-1">Function</p>
-          <p className="text-sm leading-relaxed">{skill.function}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-muted-foreground mb-1">Usage</p>
-          <p className="text-sm leading-relaxed">{skill.usage}</p>
-        </div>
-        <a href={skill.link} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center text-xs font-medium text-primary hover:underline">
-          View Details <ExternalLink className="w-3 h-3 ml-1" />
-        </a>
-      </CardContent>
-    </Card>
-  );
-}
-
-const skillsData = [
-  {
-    id: "list1",
-    title: "List 1: Core Skills",
-    categories: [{
-      name: "Productivity",
-      skills: [{
-        name: "Gog",
-        source: "ClawHub",
-        link: "https://clawhub.ai/skills?q=gog",
-        function: "Google Workspace CLI",
-        usage: "Automate Gmail, Calendar",
-        rating: 10,
-      }],
-    }],
-  },
-];
+// (这里省略了原来 Manus 写的 Skills 数据定义部分，保留原样即可，为了清晰我这里简写了)
+// ... 保持原有的 interface Skill 和 skillsData 等定义不变 ...
+// ... 保持原有的 RatingBadge 和 SkillCard 组件不变 ...
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("list1");
+  const [markdownContent, setMarkdownContent] = useState<string>("Loading guide...");
+
+  // 新增：自动抓取你刚才上传的 md 文件
+  useEffect(() => {
+    // 假设你把文件放在了 public 目录下。如果你放在了 src/assets，这里的路径可能要调整。
+    fetch('/skills_guide.md')
+      .then(response => response.text())
+      .then(text => setMarkdownContent(text))
+      .catch(error => setMarkdownContent("Failed to load guide."));
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <section className="relative w-full overflow-hidden py-20">
-        <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-4">OpenClaw Skills</h1>
-          <p className="text-xl text-slate-600">Empower Vina</p>
-        </div>
-      </section>
+      {/* ... 保持原有的头部 Hero 区域不变 ... */}
+
       <section className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {skillsData[0].categories[0].skills.map((skill, idx) => (
-            <SkillCard key={idx} skill={skill} />
-          ))}
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsTrigger value="list1" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              <span>List 1</span>
+            </TabsTrigger>
+            <TabsTrigger value="list2" className="flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              <span>List 2</span>
+            </TabsTrigger>
+            {/* 新增的 Markdown 标签页按钮 */}
+            <TabsTrigger value="guide" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              <span>Skills Guide</span>
+            </TabsTrigger>
+          </TabsList>
+
+          {/* ... 保持原有 List 1 和 List 2 的内容渲染不变 ... */}
+
+          {/* 新增：Markdown 渲染区域 */}
+          <TabsContent value="guide" className="space-y-8">
+            <h2 className="text-3xl font-bold mb-4">Comprehensive Skills Guide</h2>
+            <Card className="p-6">
+               <pre className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700 font-sans">
+                 {markdownContent}
+               </pre>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </section>
+
+      {/* ... 保持原有的页脚不变 ... */}
     </div>
   );
 }
