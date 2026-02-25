@@ -10,7 +10,8 @@ const __dirname = path.dirname(__filename)
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss() // 就是少了这一行，导致排版全部丢失！
+    // 重新启用样式引擎，找回你丢失的 UI 界面
+    tailwindcss()
   ],
   resolve: {
     alias: {
