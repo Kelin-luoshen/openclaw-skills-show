@@ -1,6 +1,7 @@
 name = "openclaw-skills"
 main = "dist/index.js"
 compatibility_date = "2024-02-25"
+compatibility_flags = [ "nodejs_compat" ]
 
 [assets]
 directory = "dist"
